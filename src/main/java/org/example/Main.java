@@ -10,7 +10,6 @@ import com.googlecode.lanterna.terminal.Terminal;
 import org.example.View.userTextView;
 
 import java.io.IOException;
-import java.security.Key;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -22,7 +21,8 @@ public class Main {
         new userTextView(screen);
 
         userTextView.printHomePage();
-        userTextView.clickKey(terminal);
+        userTextView.clickKeyMenu(terminal);
+        userTextView.whichOptionIsChoosed(terminal, 0);
 
     }
 }

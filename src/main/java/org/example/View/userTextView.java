@@ -15,6 +15,8 @@ import java.util.Arrays;
 public class userTextView {
 
     private static Screen sc;
+    private static ArrayList<String> menuList = new ArrayList<>(Arrays.asList("Zadania", "Produkty", "Lista zakupów", "Wyjscie"));
+    private static ArrayList<String> taskMenuList = new ArrayList<>(Arrays.asList("Dodaj Zadanie", "Usun Zadanie", "Edytuj Zadanie", "Wyswietl Zadania", "Wroc"));
 
     public userTextView(Screen sc) {
         this.sc = sc;
@@ -65,26 +67,33 @@ public class userTextView {
             e.printStackTrace();
         }
     }
-    public static void printMenu() {
+
+
+    public static void printMenu(int selected) {
 
         sc.clear();
-
-        ArrayList<String> menuList = new ArrayList<>();
-        menuList.addAll(Arrays.asList("Zadania", "Produkty","Wyjscie"));
 
         int cols = getCols();
 
         TextGraphics menuTextGraphics = sc.newTextGraphics();
+        menuTextGraphics.setForegroundColor(TextColor.ANSI.GREEN);
 
-        menuTextGraphics.putString(cols/2 - 13, 4, "  __  __                  ", SGR.BOLD);
-        menuTextGraphics.putString(cols/2 - 13, 5, " |  \\/  |                 ", SGR.BOLD);
-        menuTextGraphics.putString(cols/2 - 13, 6, " | \\  / | ___ _ __  _   _ ", SGR.BOLD);
-        menuTextGraphics.putString(cols/2 - 13, 7, " | |\\/| |/ _ \\ '_ \\| | | |", SGR.BOLD);
-        menuTextGraphics.putString(cols/2 - 13, 8, " | |  | |  __/ | | | |_| |", SGR.BOLD);
-        menuTextGraphics.putString(cols/2 - 13, 9, " |_|  |_|\\___|_| |_|\\__,_|", SGR.BOLD);
+        menuTextGraphics.putString(cols / 2 - 13, 4, "  __  __                  ", SGR.BOLD);
+        menuTextGraphics.putString(cols / 2 - 13, 5, " |  \\/  |                 ", SGR.BOLD);
+        menuTextGraphics.putString(cols / 2 - 13, 6, " | \\  / | ___ _ __  _   _ ", SGR.BOLD);
+        menuTextGraphics.putString(cols / 2 - 13, 7, " | |\\/| |/ _ \\ '_ \\| | | |", SGR.BOLD);
+        menuTextGraphics.putString(cols / 2 - 13, 8, " | |  | |  __/ | | | |_| |", SGR.BOLD);
+        menuTextGraphics.putString(cols / 2 - 13, 9, " |_|  |_|\\___|_| |_|\\__,_|", SGR.BOLD);
 
-//        menuTextGraphics.putString();
 
+        for (int i = 0; i < menuList.size(); i++) {
+            if (i  == selected) {
+                menuTextGraphics.setForegroundColor(TextColor.ANSI.RED);
+            }else{
+                menuTextGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+            }
+            menuTextGraphics.putString((cols - menuList.get(i).length()) / 2, i + 11, menuList.get(i));
+        }
 
         try {
             sc.refresh();
@@ -93,7 +102,7 @@ public class userTextView {
         }
     }
 
-    public static void clickKey(Terminal terminal) throws IOException {
+    public static void clickKeyMenu(Terminal terminal) throws IOException {
 
         Boolean isRunning = true;
 
@@ -102,7 +111,7 @@ public class userTextView {
             if (pressedKey != null) {
                 switch (pressedKey.getKeyType()) {
                     case Enter -> {
-                        printMenu();
+                        printMenu(0);
                         isRunning = false;
                     }
                     case Escape -> {
@@ -115,6 +124,97 @@ public class userTextView {
         }
     }
 
+    public static void whichOptionIsChoosed(Terminal terminal, int selected) throws IOException {
+
+        Boolean isRunningOption = true;
+
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape -> {
+                        sc.close();
+                        System.exit(0);
+                        isRunningOption = false;
+                    }
+                    case ArrowDown -> {
+                        if (selected + 1 < menuList.size()) {
+                            printMenu(++selected);
+                        }
+                    }
+                    case ArrowUp -> {
+                        if (selected - 1 >= 0) {
+                            printMenu(--selected);
+                        }
+                    }
+                    case Enter -> {
+                        optionChoosed(terminal, selected);
+                        isRunningOption= false;
+                    }
+                }
+            }
+        }
+    }
+
+
+    public static void optionChoosed(Terminal terminal, int selected){
+
+        switch (selected){
+            case 0:
+                sc.clear();
+                printTaskMenu(0);
+                break;
+            default:
+                break;
+
+
+        }
+
+
+
+//        for(int i = 0; i < menuList.size(); i++){
+//            if (i == selected){
+//                switch (menuList.get(i)){
+//                 case
+//
+//
+//                }
+//            }
+//        }
+
+    }
+
+
+    public static void printTaskMenu(int selected){
+
+        int cols = getCols();
+        TextGraphics taskMenuGraphics = sc.newTextGraphics();
+
+        taskMenuGraphics.putString(cols / 2 - 26,1, "███████╗ █████╗ ██████╗  █████╗ ███╗   ██╗██╗ █████╗ ");
+        taskMenuGraphics.putString(cols / 2 - 26,2, "╚══███╔╝██╔══██╗██╔══██╗██╔══██╗████╗  ██║██║██╔══██╗");
+        taskMenuGraphics.putString(cols / 2 - 26,3, "  ███╔╝ ███████║██║  ██║███████║██╔██╗ ██║██║███████║");
+        taskMenuGraphics.putString(cols / 2 - 26,4, " ███╔╝  ██╔══██║██║  ██║██╔══██║██║╚██╗██║██║██╔══██║");
+        taskMenuGraphics.putString(cols / 2 - 26,5, "███████╗██║  ██║██████╔╝██║  ██║██║ ╚████║██║██║  ██║");
+        taskMenuGraphics.putString(cols / 2 - 26,6, "╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝");
+
+        for (int i = 0; i < taskMenuList.size(); i++) {
+            if (i  == selected) {
+                taskMenuGraphics.setForegroundColor(TextColor.ANSI.RED);
+            }else{
+                taskMenuGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+            }
+            taskMenuGraphics.putString((cols - taskMenuList.get(i).length()) / 2, i + 9, taskMenuList.get(i));
+        }
+
+
+
+
+        try {
+            sc.refresh();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static int getCols() {
         return sc.getTerminalSize().getColumns();
