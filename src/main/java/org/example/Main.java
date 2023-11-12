@@ -22,6 +22,7 @@ public class Main {
         new userTextView(screen);
 
         userTextView.printHomePage();
+        userTextView.clickKey(terminal);
 
     }
 }
