@@ -21,8 +21,14 @@ public class Main {
         new userTextView(screen);
 
         userTextView.printHomePage();
-        userTextView.clickKeyMenu(terminal);
-        userTextView.whichOptionIsChoosed(terminal, 0);
+        userTextView.whichKeyClickedHomePage(terminal);
+        userTextView.whichOptionIsChoosedMenu(terminal, 0);
+
+//        userTextView.whichOptionIsChoosedProduct(terminal, 0);
+//
+//        userTextView.whichOptionIsChoosedTask(terminal, 0);
+//
+//        userTextView.whichOptionIsChoosedshopping(terminal, 0);
 
     }
 }

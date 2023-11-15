@@ -15,8 +15,10 @@ import java.util.Arrays;
 public class userTextView {
 
     private static Screen sc;
-    private static ArrayList<String> menuList = new ArrayList<>(Arrays.asList("Zadania", "Produkty", "Lista zakupów", "Wyjscie"));
-    private static ArrayList<String> taskMenuList = new ArrayList<>(Arrays.asList("Dodaj Zadanie", "Usun Zadanie", "Edytuj Zadanie", "Wyswietl Zadania", "Wroc"));
+    private static final ArrayList<String> menuList = new ArrayList<>(Arrays.asList("Zadania", "Produkty", "Lista zakupów", "Wyjscie"));
+    private static final ArrayList<String> taskMenuList = new ArrayList<>(Arrays.asList("Dodaj Zadanie", "Usun Zadanie", "Edytuj Zadanie", "Wyswietl Zadania", "Wroc"));
+    private static final ArrayList<String> productMenuList = new ArrayList<>(Arrays.asList("Dodaj Produkt", "Usun Produkt", "Edytuj Produkt", "Wyswietl produkty", "Wroc"));
+    private static final ArrayList<String> shoppingMenuList = new ArrayList<>(Arrays.asList("Stworz Liste Zakupow", "Usun Liste Zakupow", "Dodaj produkt do listy", "Wyswietl Liste", "Wroc"));
 
     public userTextView(Screen sc) {
         this.sc = sc;
@@ -24,6 +26,256 @@ public class userTextView {
 
     //    ASCII
 //    big, doom, grafitii, slant, soft, standard ||| electronic ||| chunky, ivrit, lean ||| shadow
+
+    public static void whichKeyClickedHomePage(Terminal terminal) throws IOException {
+
+        boolean isRunning = true;
+
+        while (isRunning) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Enter:
+                        printMenu(0);
+                        isRunning = false;
+                        break;
+                    case Escape:
+                        sc.close();
+                        System.exit(0);
+                        isRunning = false;
+                        break;
+                }
+            }
+        }
+    }
+
+    public static void whichOptionIsChoosedMenu(Terminal terminal, int selected) throws IOException {
+
+        boolean isRunningOption = true;
+
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape:
+                        sc.close();
+                        System.exit(0);
+                        isRunningOption = false;
+                        break;
+                    case ArrowDown:
+                        if (selected + 1 < menuList.size()) {
+                            printMenu(++selected);
+                        }
+                        break;
+                    case ArrowUp:
+                        if (selected - 1 >= 0) {
+                            printMenu(--selected);
+                        }
+                        break;
+                    case Enter:
+                        optionChoosedMenu(terminal, selected);
+                        isRunningOption= false;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+    public static void optionChoosedMenu(Terminal terminal, int selected) throws IOException {
+
+        switch (selected) {
+            case 0 -> {
+                sc.clear();
+                printTaskMenu(0);
+                whichOptionIsChoosedTask(terminal, selected);
+            }
+            case 1 -> {
+                sc.clear();
+                printProductMenu(0);
+                whichOptionIsChoosedProduct(terminal, selected);
+            }
+            case 2 -> {
+                sc.clear();
+                printShoppingMenu(0);
+                whichOptionIsChoosedshopping(terminal, selected);
+            }
+            case 3 -> {
+                sc.close();
+                System.exit(0);
+            }
+            default -> {
+            }
+        }
+    }
+
+    public static void whichOptionIsChoosedTask(Terminal terminal, int selected) throws IOException {
+
+        boolean isRunningOption = true;
+
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape -> {
+                        sc.close();
+                        System.exit(0);
+                        isRunningOption = false;
+                    }
+                    case ArrowDown -> {
+                        if (selected + 1 < shoppingMenuList.size()) {
+                            printTaskMenu(++selected);
+                        }
+                    }
+                    case ArrowUp -> {
+                        if (selected - 1 >= 0) {
+                            printTaskMenu(--selected);
+                        }
+                    }
+                    case Enter -> {
+                        optionChoosedTask(terminal, selected);
+                        isRunningOption= false;
+                    }
+                }
+            }
+        }
+    }
+    public static void optionChoosedTask(Terminal terminal, int selected) throws IOException {
+
+        switch (selected) {
+            case 0:
+                sc.clear();
+
+                break;
+            case 1:
+                sc.clear();
+
+                break;
+            case 2:
+                sc.clear();
+
+                break;
+            case 3:
+                sc.close();
+                System.exit(0);
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    public static void whichOptionIsChoosedProduct(Terminal terminal, int selected) throws IOException {
+
+        boolean isRunningOption = true;
+
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape -> {
+                        sc.close();
+                        System.exit(0);
+                        isRunningOption = false;
+                    }
+                    case ArrowDown -> {
+                        if (selected + 1 < shoppingMenuList.size()) {
+                            printProductMenu(++selected);
+                        }
+                    }
+                    case ArrowUp -> {
+                        if (selected - 1 >= 0) {
+                            printProductMenu(--selected);
+                        }
+                    }
+                    case Enter -> {
+                        optionChoosedProduct(terminal, selected);
+                        isRunningOption= false;
+                    }
+                }
+            }
+        }
+    }
+    public static void optionChoosedProduct(Terminal terminal, int selected) throws IOException {
+
+        switch (selected) {
+            case 0:
+                sc.clear();
+
+                break;
+            case 1:
+                sc.clear();
+
+                break;
+            case 2:
+                sc.clear();
+
+                break;
+            case 3:
+                sc.close();
+                System.exit(0);
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    public static void whichOptionIsChoosedshopping(Terminal terminal, int selected) throws IOException {
+
+        boolean isRunningOption = true;
+
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape -> {
+                        sc.close();
+                        System.exit(0);
+                        isRunningOption = false;
+                    }
+                    case ArrowDown -> {
+                        if (selected + 1 < shoppingMenuList.size()) {
+                            printShoppingMenu(++selected);
+                        }
+                    }
+                    case ArrowUp -> {
+                        if (selected - 1 >= 0) {
+                            printShoppingMenu(--selected);
+                        }
+                    }
+                    case Enter -> {
+                        optionChoosedShopping(terminal, selected);
+                        isRunningOption= false;
+                    }
+                }
+            }
+        }
+    }
+    public static void optionChoosedShopping(Terminal terminal, int selected) throws IOException {
+
+        switch (selected) {
+            case 0:
+                sc.clear();
+
+                break;
+            case 1:
+                sc.clear();
+
+                break;
+            case 2:
+                sc.clear();
+
+                break;
+            case 3:
+                sc.close();
+                System.exit(0);
+                break;
+            default:
+                break;
+
+        }
+    }
     public static void printHomePage() {
 
         TextGraphics titleGraphics = sc.newTextGraphics();
@@ -85,7 +337,6 @@ public class userTextView {
         menuTextGraphics.putString(cols / 2 - 13, 8, " | |  | |  __/ | | | |_| |", SGR.BOLD);
         menuTextGraphics.putString(cols / 2 - 13, 9, " |_|  |_|\\___|_| |_|\\__,_|", SGR.BOLD);
 
-
         for (int i = 0; i < menuList.size(); i++) {
             if (i  == selected) {
                 menuTextGraphics.setForegroundColor(TextColor.ANSI.RED);
@@ -101,89 +352,6 @@ public class userTextView {
             e.printStackTrace();
         }
     }
-
-    public static void clickKeyMenu(Terminal terminal) throws IOException {
-
-        Boolean isRunning = true;
-
-        while (isRunning) {
-            KeyStroke pressedKey = terminal.pollInput();
-            if (pressedKey != null) {
-                switch (pressedKey.getKeyType()) {
-                    case Enter -> {
-                        printMenu(0);
-                        isRunning = false;
-                    }
-                    case Escape -> {
-                        sc.close();
-                        System.exit(0);
-                        isRunning = false;
-                    }
-                }
-            }
-        }
-    }
-
-    public static void whichOptionIsChoosed(Terminal terminal, int selected) throws IOException {
-
-        Boolean isRunningOption = true;
-
-        while (isRunningOption) {
-            KeyStroke pressedKey = terminal.pollInput();
-            if (pressedKey != null) {
-                switch (pressedKey.getKeyType()) {
-                    case Escape -> {
-                        sc.close();
-                        System.exit(0);
-                        isRunningOption = false;
-                    }
-                    case ArrowDown -> {
-                        if (selected + 1 < menuList.size()) {
-                            printMenu(++selected);
-                        }
-                    }
-                    case ArrowUp -> {
-                        if (selected - 1 >= 0) {
-                            printMenu(--selected);
-                        }
-                    }
-                    case Enter -> {
-                        optionChoosed(terminal, selected);
-                        isRunningOption= false;
-                    }
-                }
-            }
-        }
-    }
-
-
-    public static void optionChoosed(Terminal terminal, int selected){
-
-        switch (selected){
-            case 0:
-                sc.clear();
-                printTaskMenu(0);
-                break;
-            default:
-                break;
-
-
-        }
-
-
-
-//        for(int i = 0; i < menuList.size(); i++){
-//            if (i == selected){
-//                switch (menuList.get(i)){
-//                 case
-//
-//
-//                }
-//            }
-//        }
-
-    }
-
 
     public static void printTaskMenu(int selected){
 
@@ -206,8 +374,59 @@ public class userTextView {
             taskMenuGraphics.putString((cols - taskMenuList.get(i).length()) / 2, i + 9, taskMenuList.get(i));
         }
 
+        try {
+            sc.refresh();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public static void printProductMenu(int selected){
+        int cols = getCols();
+        TextGraphics productMenuGraphics = sc.newTextGraphics();
 
+        productMenuGraphics.putString(cols / 2 - 34,1, "██████╗ ██████╗  ██████╗ ██████╗ ██╗   ██╗██╗  ██╗████████╗██╗   ██╗");
+        productMenuGraphics.putString(cols / 2 - 34,2, "██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██║   ██║██║ ██╔╝╚══██╔══╝╚██╗ ██╔╝");
+        productMenuGraphics.putString(cols / 2 - 34,3, "██████╔╝██████╔╝██║   ██║██║  ██║██║   ██║█████╔╝    ██║    ╚████╔╝ ");
+        productMenuGraphics.putString(cols / 2 - 34,4, "██╔═══╝ ██╔══██╗██║   ██║██║  ██║██║   ██║██╔═██╗    ██║     ╚██╔╝  ");
+        productMenuGraphics.putString(cols / 2 - 34,5, "██║     ██║  ██║╚██████╔╝██████╔╝╚██████╔╝██║  ██╗   ██║      ██║   ");
+        productMenuGraphics.putString(cols / 2 - 34,6, "╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝      ╚═╝  ");
+
+        for (int i = 0; i < productMenuList.size(); i++) {
+            if (i  == selected) {
+                productMenuGraphics.setForegroundColor(TextColor.ANSI.RED);
+            }else{
+                productMenuGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+            }
+            productMenuGraphics.putString((cols - productMenuList.get(i).length()) / 2, i + 9, productMenuList.get(i));
+        }
+
+        try {
+            sc.refresh();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void printShoppingMenu(int selected){
+        int cols = getCols();
+        TextGraphics shoppingMenuGraphics = sc.newTextGraphics();
+
+        shoppingMenuGraphics.putString(cols / 2 - 26,1, "███████╗ █████╗ ██╗  ██╗██╗   ██╗██████╗ ██╗   ██╗");
+        shoppingMenuGraphics.putString(cols / 2 - 26,2, "╚══███╔╝██╔══██╗██║ ██╔╝██║   ██║██╔══██╗╚██╗ ██╔╝");
+        shoppingMenuGraphics.putString(cols / 2 - 26,3, "  ███╔╝ ███████║█████╔╝ ██║   ██║██████╔╝ ╚████╔╝ ");
+        shoppingMenuGraphics.putString(cols / 2 - 26,4, " ███╔╝  ██╔══██║██╔═██╗ ██║   ██║██╔═══╝   ╚██╔╝  ");
+        shoppingMenuGraphics.putString(cols / 2 - 26,5, "███████╗██║  ██║██║  ██╗╚██████╔╝██║        ██║   ");
+        shoppingMenuGraphics.putString(cols / 2 - 26,6, "╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝        ╚═╝   ");
+
+        for (int i = 0; i < shoppingMenuList.size(); i++) {
+            if (i  == selected) {
+                shoppingMenuGraphics.setForegroundColor(TextColor.ANSI.RED);
+            }else{
+                shoppingMenuGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+            }
+            shoppingMenuGraphics.putString((cols - shoppingMenuList.get(i).length()) / 2, i + 9, shoppingMenuList.get(i));
+        }
 
         try {
             sc.refresh();
