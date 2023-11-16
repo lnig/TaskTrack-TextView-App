@@ -11,13 +11,26 @@ public class Task {
 
     private String description;
 
-    private priorityType priority;
+    public Task(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
 
-    private statusType status;
+    @Override
+    public String toString() {
+        return "Task{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 
-    private Date whenNeedsToBeDone;
-
-    private User whoWillDo;
+    //    private priorityType priority;
+//
+//    private statusType status;
+//
+//    private Date whenNeedsToBeDone;
+//
+//    private User whoWillDo;
 
 
 }

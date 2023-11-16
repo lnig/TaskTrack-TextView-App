@@ -5,15 +5,36 @@ import org.example.Model.Type.measureType;
 public class Product {
 
     private String name;
-
     private String category;
-
     private double price;
 
-    private int amount;
+    public Product(String name, String category, double price) {
+        this.name = name;
+        this.category = category;
+        this.price = price;
+    }
 
-    private measureType measure;
+    public String getName() {
+        return name;
+    }
 
-    private boolean isPurchased;
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
 }

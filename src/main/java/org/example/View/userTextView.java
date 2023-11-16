@@ -7,6 +7,9 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
+import org.example.Controller.taskController;
+import org.example.Controller.userInput;
+import org.example.Model.Class.Task;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +52,7 @@ public class userTextView {
         }
     }
 
-    public static void whichOptionIsChoosedMenu(Terminal terminal, int selected) throws IOException {
+    public static void whichOptionIsChoosedMenu(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         boolean isRunningOption = true;
 
@@ -82,7 +85,7 @@ public class userTextView {
         }
 
 
-    public static void optionChoosedMenu(Terminal terminal, int selected) throws IOException {
+    public static void optionChoosedMenu(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         switch (selected) {
             case 0 -> {
@@ -109,7 +112,7 @@ public class userTextView {
         }
     }
 
-    public static void whichOptionIsChoosedTask(Terminal terminal, int selected) throws IOException {
+    public static void whichOptionIsChoosedTask(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         boolean isRunningOption = true;
 
@@ -140,12 +143,21 @@ public class userTextView {
             }
         }
     }
-    public static void optionChoosedTask(Terminal terminal, int selected) throws IOException {
+    public static void optionChoosedTask(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         switch (selected) {
             case 0:
                 sc.clear();
-
+                String nameProd = userInput.getUserInput(terminal,sc,"Wprowadź nazwe i naciśnij Enter:");
+                String catProd = userInput.getUserInput(terminal,sc,"Wprowadź nazwe i naciśnij Enter:");
+                String priceProd = userInput.getUserInput(terminal,sc,"Wprowadź nazwe i naciśnij Enter:");
+                if (nameProd != null && catProd != null && priceProd != null) {
+                    System.out.println("sssssssss");
+                    System.out.println(nameProd + " " + catProd + " " + priceProd);
+                    taskController.addTask(new Task(nameProd, catProd));
+                    printTaskMenu(0);
+                    whichOptionIsChoosedTask(terminal, 0);
+                }
                 break;
             case 1:
                 sc.clear();
@@ -156,9 +168,17 @@ public class userTextView {
 
                 break;
             case 3:
-                sc.close();
-                System.exit(0);
-                break;
+                sc.clear();
+                System.out.println("weszlo");
+                ArrayList<Task> list = taskController.getTasks();
+                for (int i = 0; i < list.size(); i++){
+                    System.out.println("sss");
+                }
+
+//            case 4:
+//                sc.close();
+//                System.exit(0);
+//                break;
             default:
                 break;
 
@@ -355,6 +375,7 @@ public class userTextView {
 
     public static void printTaskMenu(int selected){
 
+        sc.clear();
         int cols = getCols();
         TextGraphics taskMenuGraphics = sc.newTextGraphics();
 
@@ -382,6 +403,7 @@ public class userTextView {
     }
 
     public static void printProductMenu(int selected){
+        sc.clear();
         int cols = getCols();
         TextGraphics productMenuGraphics = sc.newTextGraphics();
 
