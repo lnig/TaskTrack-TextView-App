@@ -1,7 +1,5 @@
 package org.example;
 
-import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -22,7 +20,6 @@ public class Main {
         userTextView.printHomePage();
         userTextView.whichKeyClickedHomePage(terminal);
         userTextView.whichOptionIsChoosedMenu(terminal, 0);
-
 
     }
 }
