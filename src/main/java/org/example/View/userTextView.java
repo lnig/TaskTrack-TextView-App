@@ -19,11 +19,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.googlecode.lanterna.input.KeyType.Delete;
+
 public class userTextView {
 
     private static Screen sc;
     private static final ArrayList<String> menuList = new ArrayList<>(Arrays.asList("Zadania", "Produkty", "Lista zakupów", "Wyjscie"));
-    private static final ArrayList<String> taskMenuList = new ArrayList<>(Arrays.asList("Dodaj Zadanie", "Usun Zadanie", "Edytuj Zadanie", "Wyswietl Zadania", "Wroc"));
+    private static final ArrayList<String> taskMenuList = new ArrayList<>(Arrays.asList("Dodaj Zadanie", "Wyswietl Zadania", "Wroc"));
     private static final ArrayList<String> productMenuList = new ArrayList<>(Arrays.asList("Dodaj Produkt", "Usun Produkt", "Edytuj Produkt", "Wyswietl produkty", "Wroc"));
     private static final ArrayList<String> shoppingMenuList = new ArrayList<>(Arrays.asList("Stworz Liste Zakupow", "Usun Liste Zakupow", "Dodaj produkt do listy", "Wyswietl Liste", "Wroc"));
 
@@ -70,16 +72,10 @@ public class userTextView {
                         isRunningOption = false;
                         break;
                     case ArrowDown:
-//                        if (selected + 1 < menuList.size()) {
-//                            printMenu(++selected);
-//                        }
                         selected = (selected + 1) % menuList.size();
                         printMenu(selected);
                         break;
                     case ArrowUp:
-//                        if (selected - 1 >= 0) {
-//                            printMenu(--selected);
-//                        }
                         selected = (selected - 1 + menuList.size()) % menuList.size();
                         printMenu(selected);
                         break;
@@ -134,7 +130,7 @@ public class userTextView {
                         isRunningOption = false;
                     }
                     case ArrowDown -> {
-                        if (selected + 1 < shoppingMenuList.size()) {
+                        if (selected + 1 < taskMenuList.size()) {
                             printTaskMenu(++selected);
                         }
                     }
@@ -160,50 +156,125 @@ public class userTextView {
                 String catProd = userInput.getUserInput(terminal,sc,"Wprowadź nazwe i naciśnij Enter:");
                 priorityType priority = userInput.chooseEnumValue("Wybierz priorytet: ", priorityType.values(), sc);
                 statusType status = userInput.chooseEnumValue("Wybierz status: ", statusType.values(), sc);
+                familyMember member = userInput.chooseValueFromList("Wybierz członka rodziny", familyMemberController.getFamilyMembers(), sc);
                 if (nameProd != null && catProd != null) {
                     System.out.println("sssssssss");
                     System.out.println(nameProd + " " + catProd);
-                    taskController.addTask(new Task(nameProd, catProd, priority, status));
+                    taskController.addTask(new Task(nameProd, catProd, priority, status, member));
                     printTaskMenu(0);
                     whichOptionIsChoosedTask(terminal, 0);
                 }
                 break;
             case 1:
                 sc.clear();
-
+                printAllTasks(0);
+                whichTaskIsChoosed(terminal,selected);
                 break;
             case 2:
                 sc.clear();
-
-                break;
-            case 3:
-                sc.clear();
-                System.out.println("weszlo");
-                ArrayList<familyMember> list1 = familyMemberController.getFamilyMembers();
-                for (int i = 0; i < list1.size(); i++){
-                    System.out.println(list1.get(i).getName());
-                }
-                ArrayList<Task> list = taskController.getTasks();
-                for (int i = 0; i < list.size(); i++){
-                    System.out.println(list.get(i).getTitle() + " " + list.get(i).getDescription() + " " +
-                            list.get(i).getPriority() + " " + list.get(i).getStatus());
-                }
-
-
-//            case 4:
-//                sc.close();
-//                System.exit(0);
-//                break;
+                printMenu(0);
+                whichOptionIsChoosedMenu(terminal, selected);
             default:
                 break;
 
         }
     }
 
-    public static void whichOptionIsChoosedProduct(Terminal terminal, int selected) throws IOException {
+    public static void printAllTasks(int selected){
+        sc.clear();
+        TextGraphics printAllTasksGraphics = sc.newTextGraphics();
+
+
+        ArrayList<Task> list1 = taskController.getTasks();
+        for (int i = 0; i < list1.size(); i++) {
+            if (i  == selected) {
+                printAllTasksGraphics.setForegroundColor(TextColor.ANSI.RED);
+            }else{
+                printAllTasksGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+            }
+            printAllTasksGraphics.putString(1, i + 1, list1.get(i).getTitle() + " " + list1.get(i).getDescription() + " " +
+                                                           list1.get(i).getStatus() + " " + list1.get(i).getPriority() + " " +
+                                                            list1.get(i).getWhoWillDo());
+        }
+
+        try {
+            sc.refresh();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public static void whichTaskIsChoosed(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         boolean isRunningOption = true;
 
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape -> {
+                        sc.close();
+                        System.exit(0);
+                        isRunningOption = false;
+                    }
+                    case ArrowDown -> {
+                        selected = (selected + 1) % taskController.getTasks().size();
+                        printAllTasks(selected);
+                    }
+                    case ArrowUp -> {
+                        selected = (selected - 1 + taskController.getTasks().size()) % taskController.getTasks().size();
+                        printAllTasks(selected);
+                    }
+                    case Delete -> {
+                        sc.clear();
+                        taskController.removeTask(selected);
+                        printAllTasks(0);
+                    }
+                    case Enter -> {
+                        sc.clear();
+                        Task task = taskController.getTasks().get(selected);
+                        System.out.println(selected);
+                        whatIsChanged(terminal,taskController.getTasks().get(selected));
+                        printAllTasks(0);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void whatIsChanged(Terminal terminal, Task task) throws IOException, InterruptedException {
+        ArrayList<String> list = new ArrayList<>(Arrays.asList("Tytul", "Opis", "Status", "Priorytet", "Czlonek rodziny"));
+
+        String t = userInput.chooseValueFromListString("Co chcesz zmienic?", list, sc);
+        String newText = "";
+        switch (t){
+            case "Tytul" -> {
+                newText = userInput.getUserInput(terminal, sc, "Podaj nowy tytul");
+                task.setTitle(newText);
+            }
+            case "Opis"->{
+                newText = userInput.getUserInput(terminal, sc, "Podaj nowy Opis");
+                task.setDescription(newText);
+            }
+            case "Status" ->{
+                statusType status = userInput.chooseEnumValue("Wybierz status: ", statusType.values(), sc);
+                task.setStatus(status);
+            }
+            case "Priorytet"->{
+                priorityType priority = userInput.chooseEnumValue("Wybierz priorytet: ", priorityType.values(), sc);
+                task.setPriority(priority);
+            }
+            case "Czlonek rodziny"->{
+                familyMember member = userInput.chooseValueFromList("Wybierz członka rodziny", familyMemberController.getFamilyMembers(), sc);
+                task.setWhoWillDo(member);
+            }
+        }
+    }
+
+    public static void whichOptionIsChoosedProduct(Terminal terminal, int selected) throws IOException {
+        boolean isRunningOption = true;
         while (isRunningOption) {
             KeyStroke pressedKey = terminal.pollInput();
             if (pressedKey != null) {
@@ -395,8 +466,8 @@ public class userTextView {
     public static void printMenu(int selected) {
 
         sc.clear();
-
         int cols = getCols();
+
 
         TextGraphics menuTextGraphics = sc.newTextGraphics();
         menuTextGraphics.setForegroundColor(TextColor.ANSI.GREEN);
@@ -455,8 +526,8 @@ public class userTextView {
 
     public static void printProductMenu(int selected){
         sc.clear();
-        int cols = getCols();
         TextGraphics productMenuGraphics = sc.newTextGraphics();
+        int cols = getCols();
 
         productMenuGraphics.putString(cols / 2 - 34,1, "██████╗ ██████╗  ██████╗ ██████╗ ██╗   ██╗██╗  ██╗████████╗██╗   ██╗");
         productMenuGraphics.putString(cols / 2 - 34,2, "██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██║   ██║██║ ██╔╝╚══██╔══╝╚██╗ ██╔╝");
@@ -482,8 +553,8 @@ public class userTextView {
     }
 
     public static void printShoppingMenu(int selected){
-        int cols = getCols();
         TextGraphics shoppingMenuGraphics = sc.newTextGraphics();
+        int cols = getCols();
 
         shoppingMenuGraphics.putString(cols / 2 - 26,1, "███████╗ █████╗ ██╗  ██╗██╗   ██╗██████╗ ██╗   ██╗");
         shoppingMenuGraphics.putString(cols / 2 - 26,2, "╚══███╔╝██╔══██╗██║ ██╔╝██║   ██║██╔══██╗╚██╗ ██╔╝");
@@ -507,7 +578,6 @@ public class userTextView {
             e.printStackTrace();
         }
     }
-
     public static int getCols() {
         return sc.getTerminalSize().getColumns();
     }

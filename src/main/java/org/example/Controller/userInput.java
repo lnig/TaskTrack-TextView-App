@@ -8,11 +8,11 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
+import org.example.Model.Class.familyMember;
 import org.example.View.userTextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class userInput {
     public static String getUserInput(Terminal terminal, Screen screen, String message) throws IOException, InterruptedException {
@@ -174,12 +174,94 @@ public class userInput {
         return values[selectedIndex];
     }
 
-    private static void drawColoredText(String text, int x, int y, TextColor foreground, TextColor background, Screen screen) {
-        TextGraphics textGraphics = screen.newTextGraphics();
-        textGraphics.setForegroundColor(foreground);
-        textGraphics.setBackgroundColor(background);
-        textGraphics.putString(new TerminalPosition(x, y), text);
+    public static <T> T chooseValueFromList(String prompt, ArrayList<T> values, Screen screen) throws IOException {
+        TextGraphics g = screen.newTextGraphics();
+        int selectedIndex = 0;
+        int cols = screen.getTerminalSize().getColumns();
+
+        while (true) {
+            screen.clear();
+            screen.doResizeIfNecessary();
+            drawText(prompt, (cols - prompt.length()) / 2, 7, screen);
+
+            for (int i = 0; i < values.size(); i++) {
+                if (i == selectedIndex) {
+                    g.setForegroundColor(TextColor.ANSI.RED);
+                } else {
+                    g.setForegroundColor(TextColor.ANSI.GREEN);
+                }
+                g.putString((cols - values.get(i).toString().length()) / 2, i + 9, ((familyMember) values.get(i)).getName());
+            }
+
+            screen.refresh();
+
+            KeyStroke key;
+            try {
+                do {
+                    key = screen.readInput();
+                } while (key == null);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            if (key.getKeyType() == KeyType.Escape) {
+                return null;
+            } else if (key.getKeyType() == KeyType.ArrowUp) {
+                selectedIndex = (selectedIndex - 1 + values.size()) % values.size();
+            } else if (key.getKeyType() == KeyType.ArrowDown) {
+                selectedIndex = (selectedIndex + 1) % values.size();
+            } else if (key.getKeyType() == KeyType.Enter) {
+                break;
+            }
+        }
+        return values.get(selectedIndex);
     }
+
+    public static String chooseValueFromListString(String prompt, ArrayList<String> values, Screen screen) throws IOException {
+        TextGraphics g = screen.newTextGraphics();
+        int selectedIndex = 0;
+        int cols = screen.getTerminalSize().getColumns();
+
+        while (true) {
+            screen.clear();
+            screen.doResizeIfNecessary();
+            drawText(prompt, (cols - prompt.length()) / 2, 7, screen);
+
+            for (int i = 0; i < values.size(); i++) {
+                if (i == selectedIndex) {
+                    g.setForegroundColor(TextColor.ANSI.RED);
+                } else {
+                    g.setForegroundColor(TextColor.ANSI.GREEN);
+                }
+                g.putString((cols - values.get(i).toString().length()) / 2, i + 9, values.get(i));
+            }
+
+            screen.refresh();
+
+            KeyStroke key;
+            try {
+                do {
+                    key = screen.readInput();
+                } while (key == null);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            if (key.getKeyType() == KeyType.Escape) {
+                return null;
+            } else if (key.getKeyType() == KeyType.ArrowUp) {
+                selectedIndex = (selectedIndex - 1 + values.size()) % values.size();
+            } else if (key.getKeyType() == KeyType.ArrowDown) {
+                selectedIndex = (selectedIndex + 1) % values.size();
+            } else if (key.getKeyType() == KeyType.Enter) {
+                break;
+            }
+        }
+        return values.get(selectedIndex);
+    }
+
 
     private static void drawText(String text, int x, int y, Screen screen) {
         TextGraphics textGraphics = screen.newTextGraphics();
