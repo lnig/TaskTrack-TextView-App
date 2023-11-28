@@ -7,11 +7,12 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
-import org.example.Controller.familyMemberController;
-import org.example.Controller.taskController;
-import org.example.Controller.userInput;
+import org.example.Controller.*;
+import org.example.Model.Class.Product;
+import org.example.Model.Class.Shopping;
 import org.example.Model.Class.Task;
 import org.example.Model.Class.familyMember;
+import org.example.Model.Type.measureType;
 import org.example.Model.Type.priorityType;
 import org.example.Model.Type.statusType;
 
@@ -19,22 +20,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.googlecode.lanterna.input.KeyType.Delete;
-
 public class userTextView {
 
-    private static Screen sc;
     private static final ArrayList<String> menuList = new ArrayList<>(Arrays.asList("Zadania", "Produkty", "Lista zakupów", "Wyjscie"));
-    private static final ArrayList<String> taskMenuList = new ArrayList<>(Arrays.asList("Dodaj Zadanie", "Wyswietl Zadania", "Wroc"));
-    private static final ArrayList<String> productMenuList = new ArrayList<>(Arrays.asList("Dodaj Produkt", "Usun Produkt", "Edytuj Produkt", "Wyswietl produkty", "Wroc"));
-    private static final ArrayList<String> shoppingMenuList = new ArrayList<>(Arrays.asList("Stworz Liste Zakupow", "Usun Liste Zakupow", "Dodaj produkt do listy", "Wyswietl Liste", "Wroc"));
+    private static final ArrayList<String> taskMenuList = new ArrayList<>(Arrays.asList("Dodaj Zadanie", "Wyswietl Zadania", "Wroc", "Zamknij aplikacje"));
+    private static final ArrayList<String> productMenuList = new ArrayList<>(Arrays.asList("Dodaj Produkt", "Wyswietl produkty", "Wroc", "Zamknij aplikacje"));
+    private static final ArrayList<String> shoppingMenuList = new ArrayList<>(Arrays.asList("Dodaj produkt do listy", "Wyswietl liste", "Wroc", "Zamknij aplikacje"));
+    private static Screen sc;
 
     public userTextView(Screen sc) {
         this.sc = sc;
     }
-
-    //    ASCII
-//    big, doom, grafitii, slant, soft, standard ||| electronic ||| chunky, ivrit, lean ||| shadow
 
     public static void whichKeyClickedHomePage(Terminal terminal) throws IOException, InterruptedException {
 
@@ -57,7 +53,6 @@ public class userTextView {
             }
         }
     }
-
     public static void whichOptionIsChoosedMenu(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         boolean isRunningOption = true;
@@ -66,56 +61,49 @@ public class userTextView {
             KeyStroke pressedKey = terminal.pollInput();
             if (pressedKey != null) {
                 switch (pressedKey.getKeyType()) {
-                    case Escape:
-                        sc.close();
-                        System.exit(0);
-                        isRunningOption = false;
-                        break;
-                    case ArrowDown:
+                    case ArrowDown -> {
                         selected = (selected + 1) % menuList.size();
                         printMenu(selected);
-                        break;
-                    case ArrowUp:
+                    }
+                    case ArrowUp -> {
                         selected = (selected - 1 + menuList.size()) % menuList.size();
                         printMenu(selected);
-                        break;
-                    case Enter:
+                    }
+                    case Enter -> {
                         optionChoosedMenu(terminal, selected);
-                        isRunningOption= false;
-                        break;
+                        isRunningOption = false;
+                    }
                     }
                 }
             }
         }
-
-
     public static void optionChoosedMenu(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         switch (selected) {
             case 0 -> {
                 sc.clear();
                 printTaskMenu(0);
+                selected = 0;
                 whichOptionIsChoosedTask(terminal, selected);
             }
             case 1 -> {
                 sc.clear();
                 printProductMenu(0);
+                selected = 0;
                 whichOptionIsChoosedProduct(terminal, selected);
             }
             case 2 -> {
                 sc.clear();
                 printShoppingMenu(0);
-                whichOptionIsChoosedshopping(terminal, selected);
+                selected = 0;
+                whichOptionIsChoosedShopping(terminal, selected);
             }
             case 3 -> {
                 sc.close();
                 System.exit(0);
             }
-            default -> {
-            }
         }
     }
-
     public static void whichOptionIsChoosedTask(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         boolean isRunningOption = true;
@@ -124,20 +112,13 @@ public class userTextView {
             KeyStroke pressedKey = terminal.pollInput();
             if (pressedKey != null) {
                 switch (pressedKey.getKeyType()) {
-                    case Escape -> {
-                        sc.close();
-                        System.exit(0);
-                        isRunningOption = false;
-                    }
                     case ArrowDown -> {
-                        if (selected + 1 < taskMenuList.size()) {
-                            printTaskMenu(++selected);
-                        }
+                        selected = (selected + 1) % taskMenuList.size();
+                        printTaskMenu(selected);
                     }
                     case ArrowUp -> {
-                        if (selected - 1 >= 0) {
-                            printTaskMenu(--selected);
-                        }
+                        selected = (selected - 1 + taskMenuList.size()) % taskMenuList.size();
+                        printTaskMenu(selected);
                     }
                     case Enter -> {
                         optionChoosedTask(terminal, selected);
@@ -150,51 +131,83 @@ public class userTextView {
     public static void optionChoosedTask(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         switch (selected) {
-            case 0:
+            case 0 -> {
                 sc.clear();
-                String nameProd = userInput.getUserInput(terminal,sc,"Wprowadź nazwe i naciśnij Enter:");
-                String catProd = userInput.getUserInput(terminal,sc,"Wprowadź nazwe i naciśnij Enter:");
-                priorityType priority = userInput.chooseEnumValue("Wybierz priorytet: ", priorityType.values(), sc);
-                statusType status = userInput.chooseEnumValue("Wybierz status: ", statusType.values(), sc);
-                familyMember member = userInput.chooseValueFromList("Wybierz członka rodziny", familyMemberController.getFamilyMembers(), sc);
-                if (nameProd != null && catProd != null) {
-                    System.out.println("sssssssss");
-                    System.out.println(nameProd + " " + catProd);
-                    taskController.addTask(new Task(nameProd, catProd, priority, status, member));
-                    printTaskMenu(0);
-                    whichOptionIsChoosedTask(terminal, 0);
-                }
-                break;
-            case 1:
+                String taskName = userInput.getUserInput(terminal, sc, "Wprowadź tytul i naciśnij Enter:", "Tytul: ");
+                String taskDescritpion = userInput.getUserInput(terminal, sc, "Wprowadź opis i naciśnij Enter:", "Opis: ");
+                priorityType priority = userInput.chooseEnumValue("Wybierz priorytet i nacisnij Enter: ", priorityType.values(), sc);
+                statusType status = userInput.chooseEnumValue("Wybierz status i nacisnij Enter: ", statusType.values(), sc);
+                familyMember member = userInput.chooseValueFromList("Wybierz członka rodziny i nacisnij Enter", familyMemberController.getFamilyMembers(), sc);
+                taskController.addTask(new Task(taskName, taskDescritpion, priority, status, member));
+                printTaskMenu(0);
+                selected = 0;
+                whichOptionIsChoosedTask(terminal, selected);
+            }
+            case 1 -> {
                 sc.clear();
                 printAllTasks(0);
-                whichTaskIsChoosed(terminal,selected);
-                break;
-            case 2:
+                selected = 0;
+                whichTaskIsChoosed(terminal, selected);
+            }
+            case 2 -> {
                 sc.clear();
                 printMenu(0);
+                selected = 0;
                 whichOptionIsChoosedMenu(terminal, selected);
-            default:
-                break;
+            }
+            case 3 ->{
+                sc.close();
+                System.exit(0);
+            }
 
         }
     }
-
     public static void printAllTasks(int selected){
         sc.clear();
+        int cols = getCols();
+        int rows = getRows();
         TextGraphics printAllTasksGraphics = sc.newTextGraphics();
 
+        String infoText1 = "Ponizej wyswietlone sa wszytkie zadania";
+        String infoText2 = "Jesli chcesz usunac jakies zadanie kliknij Delete";
+        String infoText3 = "lub Enter jesli chcesz cos zedytowac";
+        String infoText4 = "Kliknij Escape jesli chcesz sie cofnac";
+        String infoText5 = "Tytul | Opis | Status | Priorytet | Przypisany Czlonek";
+
+        printAllTasksGraphics.setForegroundColor(new TextColor.RGB(85, 171, 79));
+        printAllTasksGraphics.putString((cols - infoText1.length()) / 2, 1, infoText1, SGR.BOLD);
+
+        printAllTasksGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        printAllTasksGraphics.putString((cols - infoText2.length()) / 2, 2, infoText2, SGR.BOLD);
+        int indexDel = infoText2.indexOf("Delete");
+        printAllTasksGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        printAllTasksGraphics.putString(indexDel + 15, 2, "Delete", SGR.BOLD, SGR.BLINK);
+
+        printAllTasksGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        printAllTasksGraphics.putString((cols - infoText3.length()) / 2, 3, infoText3, SGR.BOLD);
+        int indexEnt = infoText3.indexOf("Enter");
+        printAllTasksGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        printAllTasksGraphics.putString((cols - "Enter".length()) / 2 - indexEnt - 7, 3, "Enter", SGR.BOLD, SGR.BLINK);
+
+        printAllTasksGraphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        printAllTasksGraphics.putString(1, 5, infoText5, SGR.BOLD);
+
+        printAllTasksGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        printAllTasksGraphics.putString((cols - infoText4.length()) / 2, rows - 2, infoText4, SGR.BOLD);
+        int indexEsc = infoText4.indexOf("Escape");
+        printAllTasksGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        printAllTasksGraphics.putString((cols - "Escape".length()) / 2 - indexEsc, rows - 2, "Escape", SGR.BOLD, SGR.BLINK);
 
         ArrayList<Task> list1 = taskController.getTasks();
         for (int i = 0; i < list1.size(); i++) {
             if (i  == selected) {
-                printAllTasksGraphics.setForegroundColor(TextColor.ANSI.RED);
+                printAllTasksGraphics.setForegroundColor(new TextColor.RGB(255, 183, 3));
             }else{
-                printAllTasksGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                printAllTasksGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
             }
-            printAllTasksGraphics.putString(1, i + 1, list1.get(i).getTitle() + " " + list1.get(i).getDescription() + " " +
-                                                           list1.get(i).getStatus() + " " + list1.get(i).getPriority() + " " +
-                                                            list1.get(i).getWhoWillDo());
+            printAllTasksGraphics.putString(1, i + 7, list1.get(i).getTitle() + " | " + list1.get(i).getDescription() + " | " +
+                                                           list1.get(i).getStatus() + " | " + list1.get(i).getPriority() + " | " +
+                                                            list1.get(i).getWhoWillDo(), SGR.BOLD);
         }
 
         try {
@@ -204,46 +217,50 @@ public class userTextView {
         }
 
     }
-
-
     public static void whichTaskIsChoosed(Terminal terminal, int selected) throws IOException, InterruptedException {
 
         boolean isRunningOption = true;
 
-        while (isRunningOption) {
-            KeyStroke pressedKey = terminal.pollInput();
-            if (pressedKey != null) {
-                switch (pressedKey.getKeyType()) {
-                    case Escape -> {
-                        sc.close();
-                        System.exit(0);
-                        isRunningOption = false;
-                    }
-                    case ArrowDown -> {
-                        selected = (selected + 1) % taskController.getTasks().size();
-                        printAllTasks(selected);
-                    }
-                    case ArrowUp -> {
-                        selected = (selected - 1 + taskController.getTasks().size()) % taskController.getTasks().size();
-                        printAllTasks(selected);
-                    }
-                    case Delete -> {
-                        sc.clear();
-                        taskController.removeTask(selected);
-                        printAllTasks(0);
-                    }
-                    case Enter -> {
-                        sc.clear();
-                        Task task = taskController.getTasks().get(selected);
-                        System.out.println(selected);
-                        whatIsChanged(terminal,taskController.getTasks().get(selected));
-                        printAllTasks(0);
+            while (isRunningOption) {
+                KeyStroke pressedKey = terminal.pollInput();
+                if (pressedKey != null) {
+                    switch (pressedKey.getKeyType()) {
+                        case Escape -> {
+                            sc.clear();
+                            printTaskMenu(0);
+                            selected = 0;
+                            whichOptionIsChoosedTask(terminal, selected);
+                        }
+                        case ArrowDown -> {
+                            if (taskController.getTasks().size() > 0) {
+                                selected = (selected + 1) % taskController.getTasks().size();
+                                printAllTasks(selected);
+                            }
+                        }
+                        case ArrowUp -> {
+                            if (taskController.getTasks().size() > 0) {
+                                selected = (selected - 1 + taskController.getTasks().size()) % taskController.getTasks().size();
+                                printAllTasks(selected);
+                            }
+                        }
+                        case Delete -> {
+                            if (taskController.getTasks().size() > 0) {
+                                sc.clear();
+                                taskController.removeTask(selected);
+                                printAllTasks(0);
+                            }
+                        }
+                        case Enter -> {
+                            if (taskController.getTasks().size() > 0) {
+                                sc.clear();
+                                whatIsChanged(terminal, taskController.getTasks().get(selected));
+                                printAllTasks(0);
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-
     public static void whatIsChanged(Terminal terminal, Task task) throws IOException, InterruptedException {
         ArrayList<String> list = new ArrayList<>(Arrays.asList("Tytul", "Opis", "Status", "Priorytet", "Czlonek rodziny"));
 
@@ -251,11 +268,11 @@ public class userTextView {
         String newText = "";
         switch (t){
             case "Tytul" -> {
-                newText = userInput.getUserInput(terminal, sc, "Podaj nowy tytul");
+                newText = userInput.getUserInput(terminal, sc, "Podaj nowy tytul", "Nowy Tytul: ");
                 task.setTitle(newText);
             }
             case "Opis"->{
-                newText = userInput.getUserInput(terminal, sc, "Podaj nowy Opis");
+                newText = userInput.getUserInput(terminal, sc, "Podaj nowy Opis", "Nowy Opis: ");
                 task.setDescription(newText);
             }
             case "Status" ->{
@@ -272,116 +289,6 @@ public class userTextView {
             }
         }
     }
-
-    public static void whichOptionIsChoosedProduct(Terminal terminal, int selected) throws IOException {
-        boolean isRunningOption = true;
-        while (isRunningOption) {
-            KeyStroke pressedKey = terminal.pollInput();
-            if (pressedKey != null) {
-                switch (pressedKey.getKeyType()) {
-                    case Escape -> {
-                        sc.close();
-                        System.exit(0);
-                        isRunningOption = false;
-                    }
-                    case ArrowDown -> {
-                        if (selected + 1 < shoppingMenuList.size()) {
-                            printProductMenu(++selected);
-                        }
-                    }
-                    case ArrowUp -> {
-                        if (selected - 1 >= 0) {
-                            printProductMenu(--selected);
-                        }
-                    }
-                    case Enter -> {
-                        optionChoosedProduct(terminal, selected);
-                        isRunningOption= false;
-                    }
-                }
-            }
-        }
-    }
-    public static void optionChoosedProduct(Terminal terminal, int selected) throws IOException {
-
-        switch (selected) {
-            case 0:
-                sc.clear();
-
-                break;
-            case 1:
-                sc.clear();
-
-                break;
-            case 2:
-                sc.clear();
-
-                break;
-            case 3:
-                sc.close();
-                System.exit(0);
-                break;
-            default:
-                break;
-
-        }
-    }
-
-    public static void whichOptionIsChoosedshopping(Terminal terminal, int selected) throws IOException {
-
-        boolean isRunningOption = true;
-
-        while (isRunningOption) {
-            KeyStroke pressedKey = terminal.pollInput();
-            if (pressedKey != null) {
-                switch (pressedKey.getKeyType()) {
-                    case Escape -> {
-                        sc.close();
-                        System.exit(0);
-                        isRunningOption = false;
-                    }
-                    case ArrowDown -> {
-                        if (selected + 1 < shoppingMenuList.size()) {
-                            printShoppingMenu(++selected);
-                        }
-                    }
-                    case ArrowUp -> {
-                        if (selected - 1 >= 0) {
-                            printShoppingMenu(--selected);
-                        }
-                    }
-                    case Enter -> {
-                        optionChoosedShopping(terminal, selected);
-                        isRunningOption= false;
-                    }
-                }
-            }
-        }
-    }
-    public static void optionChoosedShopping(Terminal terminal, int selected) throws IOException {
-
-        switch (selected) {
-            case 0:
-                sc.clear();
-
-                break;
-            case 1:
-                sc.clear();
-
-                break;
-            case 2:
-                sc.clear();
-
-                break;
-            case 3:
-                sc.close();
-                System.exit(0);
-                break;
-            default:
-                break;
-
-        }
-    }
     public static void printHomePage() {
 
         TextGraphics homePageGraphics = sc.newTextGraphics();
@@ -396,23 +303,28 @@ public class userTextView {
         String infoTextNext = "Kliknij Enter aby przejsc dalej";
         String infoTextBack = "lub Escape aby wyjsc";
 
-        for (int i = 0; i < cols; i++) {
-            homePageGraphics.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
-            homePageGraphics.putString(i, 1, String.valueOf(Symbols.TRIANGLE_UP_POINTING_BLACK));
-            homePageGraphics.putString(i, 10, String.valueOf(Symbols.TRIANGLE_DOWN_POINTING_BLACK));
-        }
-
-        homePageGraphics.setForegroundColor(TextColor.ANSI.MAGENTA);
-
         printTitle();
 
+        homePageGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
         homePageGraphics.putString((cols - welcomeText1.length()) / 2, 12, welcomeText1, SGR.BOLD);
+
+        homePageGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
         homePageGraphics.putString((cols - welcomeText2.length()) / 2, 14, welcomeText2, SGR.BOLD);
         homePageGraphics.putString((cols - welcomeText3.length()) / 2, 15, welcomeText3, SGR.BOLD);
 
+        homePageGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
         homePageGraphics.putString((cols - infoTextNext.length()) / 2, 17, infoTextNext, SGR.BOLD);
-        homePageGraphics.putString((cols - infoTextBack.length()) / 2, 18, infoTextBack, SGR.BOLD);
+        int indexEnt = infoTextNext.indexOf("Enter");
+        homePageGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        homePageGraphics.putString((cols - "Enter".length()) / 2 - indexEnt + 3, 17, "Enter", SGR.BOLD, SGR.BLINK);
 
+        homePageGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        homePageGraphics.putString((cols - infoTextBack.length()) / 2, 18, infoTextBack, SGR.BOLD);
+        int indexEsc = infoTextNext.indexOf("Escape");
+        homePageGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        homePageGraphics.putString((cols - "Escape".length()) / 2 - indexEsc - 4, 18, "Escape", SGR.BOLD, SGR.BLINK);
+
+        homePageGraphics.setForegroundColor(new TextColor.RGB(237, 237, 237));
         homePageGraphics.putString((cols - thanksText.length()) / 2, rows - 2, thanksText, SGR.BOLD);
 
         try {
@@ -421,11 +333,18 @@ public class userTextView {
             e.printStackTrace();
         }
     }
-
     public static void printTitle(){
 
         TextGraphics titleGraphics = sc.newTextGraphics();
+        int cols = getCols();
 
+        titleGraphics.setForegroundColor(new TextColor.RGB(56, 4, 14));
+        for (int i = 0; i < cols; i++) {
+            titleGraphics.putString(i, 1, String.valueOf(Symbols.BLOCK_SOLID));
+            titleGraphics.putString(i, 10, String.valueOf(Symbols.BLOCK_SOLID));
+        }
+
+        titleGraphics.setForegroundColor(new TextColor.RGB(122, 28, 36));
         titleGraphics.putString(1, 3, "████████╗ █████╗ ███████╗██╗  ██╗    ████████╗██████╗  █████╗  ██████╗██╗  ██╗");
         titleGraphics.putString(1, 4, "╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝    ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝");
         titleGraphics.putString(1, 5, "   ██║   ███████║███████╗█████╔╝        ██║   ██████╔╝███████║██║     █████╔╝ ");
@@ -439,19 +358,15 @@ public class userTextView {
             e.printStackTrace();
         }
     }
-
     public static void printAddFamilyMember(Terminal terminal) throws IOException, InterruptedException {
 
-        int howMany = Integer.parseInt(String.valueOf(userInput.getUserInputFM(terminal, sc, "Podaj ilosc czlonkow", "Ilosc: ")));
+        sc.clear();
+        int howMany = Integer.parseInt(userInput.getUserInputFM(terminal, sc, "Podaj ilosc czlonkow rodziny i nacisnij Enter", "Ilosc: ", 0));
 
         for(int i = 0; i < howMany; i++){
-            System.out.println("sssssssss");
-            String name = userInput.getUserInputFM(terminal, sc, "Podaj imie czlonka rodziny", "Imie: ");
-            System.out.println(name);
+            String name = userInput.getUserInputFM(terminal, sc, "Podaj imie czlonka rodziny i nacisnij Enter", "Imie: ", 1);
             familyMemberController.addFamilyMember(new familyMember(name));
         }
-
-        printMenu(0);
 
         try {
             sc.refresh();
@@ -459,18 +374,15 @@ public class userTextView {
             e.printStackTrace();
         }
 
-
+        printMenu(0);
     }
-
-
     public static void printMenu(int selected) {
 
         sc.clear();
         int cols = getCols();
 
-
         TextGraphics menuTextGraphics = sc.newTextGraphics();
-        menuTextGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+        menuTextGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
 
         menuTextGraphics.putString(cols / 2 - 13, 4, "  __  __                  ", SGR.BOLD);
         menuTextGraphics.putString(cols / 2 - 13, 5, " |  \\/  |                 ", SGR.BOLD);
@@ -481,11 +393,11 @@ public class userTextView {
 
         for (int i = 0; i < menuList.size(); i++) {
             if (i  == selected) {
-                menuTextGraphics.setForegroundColor(TextColor.ANSI.RED);
+                menuTextGraphics.setForegroundColor(new TextColor.RGB(122, 28, 36));
             }else{
-                menuTextGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                menuTextGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
             }
-            menuTextGraphics.putString((cols - menuList.get(i).length()) / 2, i + 11, menuList.get(i));
+            menuTextGraphics.putString((cols - menuList.get(i).length()) / 2, i + 12, menuList.get(i), SGR.BOLD);
         }
 
         try {
@@ -494,27 +406,27 @@ public class userTextView {
             e.printStackTrace();
         }
     }
-
     public static void printTaskMenu(int selected){
 
         sc.clear();
         int cols = getCols();
         TextGraphics taskMenuGraphics = sc.newTextGraphics();
 
-        taskMenuGraphics.putString(cols / 2 - 26,1, "███████╗ █████╗ ██████╗  █████╗ ███╗   ██╗██╗ █████╗ ");
-        taskMenuGraphics.putString(cols / 2 - 26,2, "╚══███╔╝██╔══██╗██╔══██╗██╔══██╗████╗  ██║██║██╔══██╗");
-        taskMenuGraphics.putString(cols / 2 - 26,3, "  ███╔╝ ███████║██║  ██║███████║██╔██╗ ██║██║███████║");
-        taskMenuGraphics.putString(cols / 2 - 26,4, " ███╔╝  ██╔══██║██║  ██║██╔══██║██║╚██╗██║██║██╔══██║");
-        taskMenuGraphics.putString(cols / 2 - 26,5, "███████╗██║  ██║██████╔╝██║  ██║██║ ╚████║██║██║  ██║");
-        taskMenuGraphics.putString(cols / 2 - 26,6, "╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝");
+        taskMenuGraphics.setForegroundColor(new TextColor.RGB(233, 196, 106));
+        taskMenuGraphics.putString(cols / 2 - 26,3, "███████╗ █████╗ ██████╗  █████╗ ███╗   ██╗██╗ █████╗ ");
+        taskMenuGraphics.putString(cols / 2 - 26,4, "╚══███╔╝██╔══██╗██╔══██╗██╔══██╗████╗  ██║██║██╔══██╗");
+        taskMenuGraphics.putString(cols / 2 - 26,5, "  ███╔╝ ███████║██║  ██║███████║██╔██╗ ██║██║███████║");
+        taskMenuGraphics.putString(cols / 2 - 26,6, " ███╔╝  ██╔══██║██║  ██║██╔══██║██║╚██╗██║██║██╔══██║");
+        taskMenuGraphics.putString(cols / 2 - 26,7, "███████╗██║  ██║██████╔╝██║  ██║██║ ╚████║██║██║  ██║");
+        taskMenuGraphics.putString(cols / 2 - 26,8, "╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝");
 
         for (int i = 0; i < taskMenuList.size(); i++) {
             if (i  == selected) {
-                taskMenuGraphics.setForegroundColor(TextColor.ANSI.RED);
+                taskMenuGraphics.setForegroundColor(new TextColor.RGB(255, 183, 3));
             }else{
-                taskMenuGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                taskMenuGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
             }
-            taskMenuGraphics.putString((cols - taskMenuList.get(i).length()) / 2, i + 9, taskMenuList.get(i));
+            taskMenuGraphics.putString((cols - taskMenuList.get(i).length()) / 2, i + 13, taskMenuList.get(i), SGR.BOLD);
         }
 
         try {
@@ -523,26 +435,26 @@ public class userTextView {
             e.printStackTrace();
         }
     }
-
     public static void printProductMenu(int selected){
         sc.clear();
         TextGraphics productMenuGraphics = sc.newTextGraphics();
         int cols = getCols();
 
-        productMenuGraphics.putString(cols / 2 - 34,1, "██████╗ ██████╗  ██████╗ ██████╗ ██╗   ██╗██╗  ██╗████████╗██╗   ██╗");
-        productMenuGraphics.putString(cols / 2 - 34,2, "██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██║   ██║██║ ██╔╝╚══██╔══╝╚██╗ ██╔╝");
-        productMenuGraphics.putString(cols / 2 - 34,3, "██████╔╝██████╔╝██║   ██║██║  ██║██║   ██║█████╔╝    ██║    ╚████╔╝ ");
-        productMenuGraphics.putString(cols / 2 - 34,4, "██╔═══╝ ██╔══██╗██║   ██║██║  ██║██║   ██║██╔═██╗    ██║     ╚██╔╝  ");
-        productMenuGraphics.putString(cols / 2 - 34,5, "██║     ██║  ██║╚██████╔╝██████╔╝╚██████╔╝██║  ██╗   ██║      ██║   ");
-        productMenuGraphics.putString(cols / 2 - 34,6, "╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝      ╚═╝  ");
+        productMenuGraphics.setForegroundColor(new TextColor.RGB(120, 165, 173));
+        productMenuGraphics.putString(cols / 2 - 34,3, "██████╗ ██████╗  ██████╗ ██████╗ ██╗   ██╗██╗  ██╗████████╗██╗   ██╗");
+        productMenuGraphics.putString(cols / 2 - 34,4, "██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██║   ██║██║ ██╔╝╚══██╔══╝╚██╗ ██╔╝");
+        productMenuGraphics.putString(cols / 2 - 34,5, "██████╔╝██████╔╝██║   ██║██║  ██║██║   ██║█████╔╝    ██║    ╚████╔╝ ");
+        productMenuGraphics.putString(cols / 2 - 34,6, "██╔═══╝ ██╔══██╗██║   ██║██║  ██║██║   ██║██╔═██╗    ██║     ╚██╔╝  ");
+        productMenuGraphics.putString(cols / 2 - 34,7, "██║     ██║  ██║╚██████╔╝██████╔╝╚██████╔╝██║  ██╗   ██║      ██║   ");
+        productMenuGraphics.putString(cols / 2 - 34,8, "╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝      ╚═╝  ");
 
         for (int i = 0; i < productMenuList.size(); i++) {
             if (i  == selected) {
-                productMenuGraphics.setForegroundColor(TextColor.ANSI.RED);
+                productMenuGraphics.setForegroundColor(new TextColor.RGB(120, 165, 173));
             }else{
-                productMenuGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                productMenuGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
             }
-            productMenuGraphics.putString((cols - productMenuList.get(i).length()) / 2, i + 9, productMenuList.get(i));
+            productMenuGraphics.putString((cols - productMenuList.get(i).length()) / 2, i + 13, productMenuList.get(i), SGR.BOLD);
         }
 
         try {
@@ -551,25 +463,368 @@ public class userTextView {
             e.printStackTrace();
         }
     }
+    public static void whichOptionIsChoosedProduct(Terminal terminal, int selected) throws IOException, InterruptedException {
+        boolean isRunningOption = true;
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape -> {
+                        sc.close();
+                        System.exit(0);
+                        isRunningOption = false;
+                    }
+                    case ArrowDown -> {
+                        selected = (selected + 1) % productMenuList.size();
+                        printProductMenu(selected);
+                    }
+                    case ArrowUp -> {
+                        selected = (selected - 1 + productMenuList.size()) % productMenuList.size();
+                        printProductMenu(selected);
+                    }
+                    case Enter -> {
+                        optionChoosedProduct(terminal, selected);
+                        isRunningOption= false;
+                    }
+                }
+            }
+        }
+    }
+    public static void optionChoosedProduct(Terminal terminal, int selected) throws IOException, InterruptedException {
+
+        switch (selected) {
+            case 0 -> {
+                sc.clear();
+                String nameProd = userInput.getUserInput(terminal, sc, "Wprowadź nazwe produktu i nacisnij Enter", "Nazwa: ");
+                String catProd = userInput.getUserInput(terminal, sc, "Wprowadź kategorie produktu i naciśnij Enter:", "Kategoria: ");
+                double price = Double.parseDouble(userInput.getUserInputFM(terminal, sc, "Podaj cene produktu i nacisnij Enter", "Cena: ", 2));
+                price*=100;
+                price = Math.round(price);
+                price/=100;
+                measureType type = userInput.chooseEnumValue("Wybierz jednostke miary i nacisnij Enter: ", measureType.values(), sc);
+                productController.addProduct(new Product(nameProd, catProd, type, price));
+                printProductMenu(0);
+                selected = 0;
+                whichOptionIsChoosedProduct(terminal, selected);
+            }
+            case 1 -> {
+                sc.clear();
+                printAllProducts(0);
+                selected = 0;
+                whichProductIsChoosed(terminal, selected);
+            }
+            case 2 -> {
+                sc.clear();
+                printMenu(0);
+                selected = 0;
+                whichOptionIsChoosedMenu(terminal, selected);
+            }
+            case 3 ->{
+                sc.close();
+                System.exit(0);
+            }
+        }
+    }
+    public static void printAllProducts(int selected){
+
+        sc.clear();
+        int cols = getCols();
+        int rows = getRows();
+        TextGraphics printAllProductsGraphics = sc.newTextGraphics();
+
+        String infoText1 = "Ponizej wyswietlone sa wszytkie produkty";
+        String infoText2 = "Jesli chcesz usunac jakis produkt kliknij Delete";
+        String infoText3 = "lub Enter jesli chcesz cos zedytowac";
+        String infoText4 = "Kliknij Escape jesli chcesz sie cofnac";
+        String infoText5 = "Nazwa | Kategoria | Cena | Jednostka Miary";
+
+        printAllProductsGraphics.setForegroundColor(new TextColor.RGB(85, 171, 79));
+        printAllProductsGraphics.putString((cols - infoText1.length()) / 2, 1, infoText1, SGR.BOLD);
+
+        printAllProductsGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        printAllProductsGraphics.putString((cols - infoText2.length()) / 2, 2, infoText2, SGR.BOLD);
+        int indexDel = infoText2.indexOf("Delete");
+        printAllProductsGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        printAllProductsGraphics.putString(indexDel + 16, 2, "Delete", SGR.BOLD, SGR.BLINK);
+
+        printAllProductsGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        printAllProductsGraphics.putString((cols - infoText3.length()) / 2, 3, infoText3, SGR.BOLD);
+        int indexEnt = infoText3.indexOf("Enter");
+        printAllProductsGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        printAllProductsGraphics.putString((cols - "Enter".length()) / 2 - indexEnt - 7, 3, "Enter", SGR.BOLD, SGR.BLINK);
+
+        printAllProductsGraphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        printAllProductsGraphics.putString(1, 5, infoText5, SGR.BOLD);
+
+        printAllProductsGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        printAllProductsGraphics.putString((cols - infoText4.length()) / 2, rows - 2, infoText4, SGR.BOLD);
+        int indexEsc = infoText4.indexOf("Escape");
+        printAllProductsGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        printAllProductsGraphics.putString((cols - "Escape".length()) / 2 - indexEsc, rows - 2, "Escape", SGR.BOLD, SGR.BLINK);
+
+        ArrayList<Product> list1 = productController.getProducts();
+        for (int i = 0; i < list1.size(); i++) {
+            if (i  == selected) {
+                printAllProductsGraphics.setForegroundColor(new TextColor.RGB(120, 165, 173));
+            }else{
+                printAllProductsGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+            }
+            printAllProductsGraphics.putString(1, i + 7, list1.get(i).getName() + " | " + list1.get(i).getCategory() + " | " +
+                    list1.get(i).getPrice() + " | " + list1.get(i).getMeasureType(), SGR.BOLD);
+        }
+
+        try {
+            sc.refresh();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void whichProductIsChoosed(Terminal terminal, int selected) throws IOException, InterruptedException {
+
+        boolean isRunningOption = true;
+
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape -> {
+                        sc.clear();
+                        printProductMenu(0);
+                        selected = 0;
+                        whichOptionIsChoosedProduct(terminal, selected);
+                    }
+                    case ArrowDown -> {
+                        if (productController.getProducts().size() > 0) {
+                            selected = (selected + 1) % productController.getProducts().size();
+                            printAllProducts(selected);
+                        }
+                    }
+                    case ArrowUp -> {
+                        if (productController.getProducts().size() > 0) {
+                            selected = (selected - 1 + productController.getProducts().size()) % productController.getProducts().size();
+                            printAllProducts(selected);
+                        }
+                    }
+                    case Delete -> {
+                        if (productController.getProducts().size() > 0) {
+                            sc.clear();
+                            productController.removeProduct(selected);
+                            printAllProducts(0);
+                        }
+                    }
+                    case Enter -> {
+                        if (productController.getProducts().size() > 0) {
+                            sc.clear();
+                            whatIsChangedProduct(terminal, productController.getProducts().get(selected));
+                            printAllProducts(0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    public static void whatIsChangedProduct(Terminal terminal, Product product) throws IOException, InterruptedException {
+        ArrayList<String> list = new ArrayList<>(Arrays.asList("Nazwa", "Kategoria", "Cena", "Jednostka miary"));
+
+        String t = userInput.chooseValueFromListString("Co chcesz zmienic?", list, sc);
+        String newText = "";
+        switch (t){
+            case "Nazwa" -> {
+                newText = userInput.getUserInput(terminal, sc, "Podaj nowa nazwe", "Nowa Nazwa: ");
+                product.setName(newText);
+            }
+            case "Kategoria"->{
+                newText = userInput.getUserInput(terminal, sc, "Podaj nowa kategorie", "Nowa Kategoria: ");
+                product.setCategory(newText);
+            }
+            case "Cena" ->{
+                double price = Double.parseDouble(userInput.getUserInputFM(terminal, sc, "Podaj nowa cene produktu i nacisnij Enter", " Nowa Cena: ", 2));
+                price*=100;
+                price = Math.round(price);
+                price/=100;
+                product.setPrice(price);
+            }
+            case "Jednostka miary"->{
+                measureType newMeasureType = userInput.chooseEnumValue("Wybierz priorytet: ", measureType.values(), sc);
+                product.setMeasureType(newMeasureType);
+            }
+        }
+    }
+    public static void whichOptionIsChoosedShopping(Terminal terminal, int selected) throws IOException, InterruptedException {
+
+        boolean isRunningOption = true;
+
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case ArrowDown -> {
+                        selected = (selected + 1) % shoppingMenuList.size();
+                        printShoppingMenu(selected);
+                    }
+                    case ArrowUp -> {
+                        selected = (selected - 1 + shoppingMenuList.size()) % shoppingMenuList.size();
+                        printShoppingMenu(selected);
+                    }
+                    case Enter -> {
+                        optionChoosedShopping(terminal, selected);
+                        isRunningOption= false;
+                    }
+                }
+            }
+        }
+    }
+    public static void optionChoosedShopping(Terminal terminal, int selected) throws IOException, InterruptedException {
+
+        switch (selected) {
+            case 0 -> {
+                if (productController.getProducts().size() > 0) {
+                    sc.clear();
+                    Product product = userInput.chooseValueFromListProd("Wybierz produkt do dodania", productController.getProducts(), sc);
+                    int amount = Integer.parseInt(userInput.getUserInputFM(terminal, sc, "Podaj Ilosc i nacisnij Enter", "Ilosc: ", 0));
+                    shoppingController.addShopping(new Shopping(product, amount));
+                    printShoppingMenu(0);
+                    selected = 0;
+                    whichOptionIsChoosedShopping(terminal, selected);
+                }
+                whichOptionIsChoosedShopping(terminal, selected);
+            }
+            case 1 -> {
+                sc.clear();
+                printAllProductsToBuy(0);
+                selected = 0;
+                whichProductIsChoosedToBuy(terminal, selected);
+            }
+            case 2 -> {
+                sc.clear();
+                printMenu(0);
+                selected = 0;
+                whichOptionIsChoosedMenu(terminal, selected);
+            }
+            case 3 -> {
+                sc.close();
+                System.exit(0);
+            }
+        }
+    }
+
+    public static void whichProductIsChoosedToBuy(Terminal terminal, int selected) throws IOException, InterruptedException {
+
+        boolean isRunningOption = true;
+
+        while (isRunningOption) {
+            KeyStroke pressedKey = terminal.pollInput();
+            if (pressedKey != null) {
+                switch (pressedKey.getKeyType()) {
+                    case Escape -> {
+                        sc.clear();
+                        printShoppingMenu(0);
+                        selected = 0;
+                        whichOptionIsChoosedShopping(terminal, selected);
+                    }
+                    case ArrowDown -> {
+                        if (shoppingController.getShopping().size() > 0) {
+                            selected = (selected + 1) % shoppingController.getShopping().size();
+                            printAllProductsToBuy(0);
+                        }
+                    }
+                    case ArrowUp -> {
+                        if (shoppingController.getShopping().size() > 0) {
+                            selected = (selected - 1 + shoppingController.getShopping().size()) % shoppingController.getShopping().size();
+                            printAllProductsToBuy(0);
+                        }
+                    }
+                    case Delete -> {
+                        if (shoppingController.getShopping().size() > 0) {
+                            sc.clear();
+                            shoppingController.removeShopping(selected);
+                            printAllProductsToBuy(0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void printAllProductsToBuy(int selected){
+
+        sc.clear();
+        int cols = getCols();
+        int rows = getRows();
+        double sum = 0;
+        TextGraphics printAllProductsTBGraphics = sc.newTextGraphics();
+
+        String infoText1 = "Ponizej wyswietlone sa wszytkie produkty do kupienia";
+        String infoText2 = "Jesli chcesz usunac jakis produkt kliknij Delete";
+        String infoText3 = "Kliknij Escape jesli chcesz sie cofnac";
+        String infoText4 = "Nazwa Produktu | Cena | Ilosc";
+
+        printAllProductsTBGraphics.setForegroundColor(new TextColor.RGB(85, 171, 79));
+        printAllProductsTBGraphics.putString((cols - infoText1.length()) / 2, 1, infoText1, SGR.BOLD);
+
+        printAllProductsTBGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        printAllProductsTBGraphics.putString((cols - infoText2.length()) / 2, 2, infoText2, SGR.BOLD);
+        int indexDel = infoText2.indexOf("Delete");
+        printAllProductsTBGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        printAllProductsTBGraphics.putString(indexDel + 16, 2, "Delete", SGR.BOLD, SGR.BLINK);
+
+        printAllProductsTBGraphics.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+        printAllProductsTBGraphics.putString(1, 5, infoText4, SGR.BOLD);
+
+        printAllProductsTBGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+        printAllProductsTBGraphics.putString((cols - infoText3.length()) / 2, rows - 2, infoText3, SGR.BOLD);
+        int indexEsc = infoText3.indexOf("Escape");
+        printAllProductsTBGraphics.setForegroundColor(new TextColor.RGB(62, 214, 49));
+        printAllProductsTBGraphics.putString((cols - "Escape".length()) / 2 - indexEsc, rows - 2, "Escape", SGR.BOLD, SGR.BLINK);
+
+        ArrayList<Shopping> list1 = shoppingController.getShopping();
+
+        for (int i = 0; i < list1.size(); i++) {
+            if (i  == selected) {
+                printAllProductsTBGraphics.setForegroundColor(new TextColor.RGB(120, 165, 173));
+            }else{
+                printAllProductsTBGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
+            }
+            printAllProductsTBGraphics.putString(1, i + 7, list1.get(i).getProduct().getName() + " | " + list1.get(i).getProduct().getPrice()+ " | " +
+                    list1.get(i).getAmount() , SGR.BOLD);
+            sum += list1.get(i).getProduct().getPrice() * list1.get(i).getAmount();
+        }
+        sum *= 100;
+        sum = Math.round(sum);
+        sum /= 100;
+
+        printAllProductsTBGraphics.putString(2, rows - 4, "Suma: " + sum, SGR.BOLD);
+
+        try {
+            sc.refresh();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public static void printShoppingMenu(int selected){
+
+        sc.clear();
         TextGraphics shoppingMenuGraphics = sc.newTextGraphics();
         int cols = getCols();
 
-        shoppingMenuGraphics.putString(cols / 2 - 26,1, "███████╗ █████╗ ██╗  ██╗██╗   ██╗██████╗ ██╗   ██╗");
-        shoppingMenuGraphics.putString(cols / 2 - 26,2, "╚══███╔╝██╔══██╗██║ ██╔╝██║   ██║██╔══██╗╚██╗ ██╔╝");
-        shoppingMenuGraphics.putString(cols / 2 - 26,3, "  ███╔╝ ███████║█████╔╝ ██║   ██║██████╔╝ ╚████╔╝ ");
-        shoppingMenuGraphics.putString(cols / 2 - 26,4, " ███╔╝  ██╔══██║██╔═██╗ ██║   ██║██╔═══╝   ╚██╔╝  ");
-        shoppingMenuGraphics.putString(cols / 2 - 26,5, "███████╗██║  ██║██║  ██╗╚██████╔╝██║        ██║   ");
-        shoppingMenuGraphics.putString(cols / 2 - 26,6, "╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝        ╚═╝   ");
+        shoppingMenuGraphics.setForegroundColor(new TextColor.RGB(145, 95, 150));
+        shoppingMenuGraphics.putString(cols / 2 - 26,3, "███████╗ █████╗ ██╗  ██╗██╗   ██╗██████╗ ██╗   ██╗");
+        shoppingMenuGraphics.putString(cols / 2 - 26,4, "╚══███╔╝██╔══██╗██║ ██╔╝██║   ██║██╔══██╗╚██╗ ██╔╝");
+        shoppingMenuGraphics.putString(cols / 2 - 26,5, "  ███╔╝ ███████║█████╔╝ ██║   ██║██████╔╝ ╚████╔╝ ");
+        shoppingMenuGraphics.putString(cols / 2 - 26,6, " ███╔╝  ██╔══██║██╔═██╗ ██║   ██║██╔═══╝   ╚██╔╝  ");
+        shoppingMenuGraphics.putString(cols / 2 - 26,7, "███████╗██║  ██║██║  ██╗╚██████╔╝██║        ██║   ");
+        shoppingMenuGraphics.putString(cols / 2 - 26,8, "╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝        ╚═╝   ");
 
         for (int i = 0; i < shoppingMenuList.size(); i++) {
             if (i  == selected) {
-                shoppingMenuGraphics.setForegroundColor(TextColor.ANSI.RED);
+                shoppingMenuGraphics.setForegroundColor(new TextColor.RGB(145, 95, 150));
             }else{
-                shoppingMenuGraphics.setForegroundColor(TextColor.ANSI.GREEN);
+                shoppingMenuGraphics.setForegroundColor(new TextColor.RGB(55, 97, 52));
             }
-            shoppingMenuGraphics.putString((cols - shoppingMenuList.get(i).length()) / 2, i + 9, shoppingMenuList.get(i));
+            shoppingMenuGraphics.putString((cols - shoppingMenuList.get(i).length()) / 2, i + 12, shoppingMenuList.get(i), SGR.BOLD);
         }
 
         try {

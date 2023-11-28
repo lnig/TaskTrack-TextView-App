@@ -2,8 +2,8 @@ package org.example.Model.Type;
 
 public enum statusType {
 
-    TODO,
-    IN_PROGRESS,
-    DONE
+    DO_ZROBIENIA,
+    W_TOKU,
+    WYKONANE
 
 }

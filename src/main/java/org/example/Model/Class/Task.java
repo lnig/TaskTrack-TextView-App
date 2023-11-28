@@ -21,7 +21,6 @@ public class Task {
         this.whoWillDo = whoWillDo;
     }
 
-
     public String getTitle() {
         return title;
     }

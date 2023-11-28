@@ -1,8 +1,6 @@
 package org.example.Controller;
 
-import org.example.Model.Class.Task;
 import org.example.Model.Class.familyMember;
-
 import java.util.ArrayList;
 
 public class familyMemberController {
@@ -10,6 +8,7 @@ public class familyMemberController {
     private static ArrayList<familyMember> familyMembers = new ArrayList<>();
 
     public static void addFamilyMember(familyMember fM){
+
         familyMembers.add(fM);
     }
 
